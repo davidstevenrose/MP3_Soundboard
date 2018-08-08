@@ -1,0 +1,3 @@
+PSI 1:
+  Date: 8/8/18
+  Notes: Fixed volume slider and looping method.
