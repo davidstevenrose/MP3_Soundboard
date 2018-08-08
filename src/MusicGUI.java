@@ -1,14 +1,10 @@
 
-import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.HeadlessException;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioSystem;
@@ -29,53 +25,58 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 /**
  *
- * @author drose
+ * @author davidstevenrose
  */
+class LoopMediaPlayer implements Runnable {
+
+    private boolean isPlaying; 
+    private String fp;
+
+    public LoopMediaPlayer(String file) {
+        this.isPlaying = true;
+        this.fp = file;
+    }    
+
+    public void setPlaying(boolean b) {
+        this.isPlaying = b;
+    }
+
+    @Override
+    public void run() {
+        try {
+            Player player;
+            while(isPlaying){
+                player = new Player(new FileInputStream(this.fp));
+                player.play();
+            }
+        } catch (Exception e) {
+            System.out.println("Exception caught: " + e.getMessage());
+        }
+    }
+}
+
 class MediaPlayer implements Runnable {
 
-    private boolean isPlaying;
-    private Player player;
-    private FloatControl vc;
-    final static Info SOURCE = Port.Info.SPEAKER;
+    private boolean isPlaying; 
     private String fp;
-    private float vol;
 
-    MediaPlayer() {
-    }
-
-    public MediaPlayer(String file, float v) {
+    public MediaPlayer(String file) {
         this.isPlaying = false;
         this.fp = file;
-        this.vol = v * 0.1f;
-    }
-
-    /**
-     * This instance method changes the volume of the referenced MediaPlayer.
-     *
-     *
-     * @param f the float value of the volume. The parameter is multiplied by
-     * 0.1 .
-     */
-    public void setVolume(float f) {
-        System.out.println("setVolumet invoked");
-        vc.setValue(f * 0.1f);
-    }
+    }    
 
     public boolean isPlaying() {
         return this.isPlaying;
     }
 
+    @Override
     public void run() {
-        try {
-            Port outline = (Port) AudioSystem.getLine(SOURCE);
-            outline.open();
-            vc = (FloatControl) outline.getControl(FloatControl.Type.VOLUME);
-            vc.setValue(this.vol);
-            System.out.print(this.vol);
+        try {                            
             FileInputStream fileInputStream = new FileInputStream(this.fp);
-            player = new Player(fileInputStream);
+            Player player = new Player(fileInputStream);
             this.isPlaying = true;
             player.play();
+            System.out.println("finished");
             this.isPlaying = false;
         } catch (Exception e) {
             System.out.println("Exception caught: " + e.getMessage());
@@ -86,17 +87,29 @@ class MediaPlayer implements Runnable {
 public class MusicGUI extends javax.swing.JFrame {
 
     private static Thread player = new Thread();
+    private static Thread loopThread;
+    private static FloatControl vc;
     private final HashMap<String, String> Tracks = new HashMap<>(20);//the value String is the file path for the mp3 file
-    private final HashMap<Integer, Component> ButtonGroup = new HashMap<>(20);//components are JButtons    
-    private final Queue<MediaPlayer> MPQueue = new LinkedList<>();
+    private final HashMap<Integer, Component> ButtonGroup = new HashMap<>(20);//components are JButtons
     private MediaPlayer mp;
-    static Info source = Port.Info.SPEAKER;//the speaker
-    static Boolean looping = false;
+    private LoopMediaPlayer lmp;
+    final static Info SOURCE = Port.Info.SPEAKER;
+    static Boolean looping = false;    
 
     public MusicGUI() {
         initComponents();
         fillTrackMap();
         fillButtonMap();
+        
+        Port outline;
+        try {
+            outline = (Port) AudioSystem.getLine(SOURCE);            
+            outline.open();
+            vc = (FloatControl) outline.getControl(FloatControl.Type.VOLUME);
+            
+        } catch (LineUnavailableException ex) {
+            Logger.getLogger(MusicGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }        
     }
 
     public void fillTrackMap() {
@@ -120,17 +133,18 @@ public class MusicGUI extends javax.swing.JFrame {
     }
 
     public void playMediaFromBind(int id) {
-        try {
+        try {            
+            vc.setValue((float) VolumeSld.getValue());
             if (Tracks.get("Track" + id) != null) {
-                if (!player.isAlive()) {
+                if (!player.isAlive()) {//player is the new thread
                     String relativeFilePath = Tracks.get("Track" + id);
-                    mp = new MediaPlayer(relativeFilePath, VolumeSld.getValue());
+                    mp = new MediaPlayer(relativeFilePath);
                     player = new Thread(mp);
                     player.start();
                 } else if (!mp.isPlaying()) {
                     String relativeFilePath = Tracks.get("Track" + id);
-                    mp = new MediaPlayer(relativeFilePath, VolumeSld.getValue());
-                    player = new Thread(mp);
+                    mp = new MediaPlayer(relativeFilePath);
+                    //player = new Thread(mp);
                     player.run();
                 }
             } else {
@@ -140,29 +154,26 @@ public class MusicGUI extends javax.swing.JFrame {
             Logger.getLogger(MusicGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public static void setVolume(float f) {
+        vc.setValue(f * 0.01f);        
+    }
 
-    public void startLoop(String tr) {
-        int i = 0;
-        do {
-            try {
-                Port outline = (Port) AudioSystem.getLine(source);
-                outline.open();
-                FloatControl vc = (FloatControl) outline.getControl(FloatControl.Type.VOLUME);
-                float v = 0.33f;
-                vc.setValue(v);
-                String relativeFilePath = Tracks.get(tr);
-                FileInputStream fileInputStream = new FileInputStream(relativeFilePath);
-                Player player = new Player(fileInputStream);
-                player.play();
-            } catch (LineUnavailableException ex) {
-                Logger.getLogger(MusicGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(MusicGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (JavaLayerException ex) {
-                Logger.getLogger(MusicGUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            i++;
-        } while (i < 3);
+    public void startLoop(String tr) { 
+        //tr = Track#
+       if(tr!=null){
+           lmp = new LoopMediaPlayer(Tracks.get(tr));
+           loopThread = new Thread(lmp);
+           loopThread.start();           
+           looping = true;
+       }
+    }
+    
+    public void stopLoop(){
+        if (looping){
+            lmp.setPlaying(false);
+            looping = false;
+        }
     }
 
     /**
@@ -794,11 +805,15 @@ public class MusicGUI extends javax.swing.JFrame {
 
     private void LoopBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoopBtnActionPerformed
         try {
-            int r = Integer.parseInt(JOptionPane.showInputDialog(null, "Whitch Track do you wish to remove", "Remove a track", JOptionPane.QUESTION_MESSAGE));
-            if (Tracks.containsKey("Track" + Integer.toString(r)) && Tracks.get("Track" + Integer.toString(r)) != null) {
-                startLoop("Track" + Integer.toString(r));
-            } else {
-                JOptionPane.showMessageDialog(null, "There is no track to remove from this button.", "Error", JOptionPane.ERROR_MESSAGE);
+            if(!looping){
+                int r = Integer.parseInt(JOptionPane.showInputDialog(null, "Whitch Track do you wish to loop play?", "Loop a track", JOptionPane.QUESTION_MESSAGE));
+                if (Tracks.containsKey("Track" + Integer.toString(r)) && Tracks.get("Track" + Integer.toString(r)) != null) {
+                    startLoop("Track" + Integer.toString(r));
+                } else {
+                    JOptionPane.showMessageDialog(null, "There is no track to play from this button.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }else{
+                JOptionPane.showMessageDialog(null, "A track is already looping. Press \"Break\" to stop the looping track.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "You have entered bad input for your button ID.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -820,7 +835,7 @@ public class MusicGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_RemoveBtnActionPerformed
 
     private void Add_ChooseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Add_ChooseBtnActionPerformed
-        JFileChooser chooser = new JFileChooser("C:\\Users\\drose\\Documents\\NetBeansProjects\\MusicGUI(MP3)\\src\\Songs");
+        JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter f = new FileNameExtensionFilter("MP3 Files", "mp3");
         chooser.setFileFilter(f);
         chooser.showOpenDialog(null);
@@ -929,14 +944,14 @@ public class MusicGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_Track05ActionPerformed
 
     private void BreakBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BreakBtnActionPerformed
-        looping = false;
+        stopLoop();
     }//GEN-LAST:event_BreakBtnActionPerformed
 
     private void VolumeSldStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_VolumeSldStateChanged
         JSlider vs = (JSlider) evt.getSource();
         if(!vs.getValueIsAdjusting()){
             if (mp != null) {
-                mp.setVolume((float) VolumeSld.getValue());
+               setVolume((float) VolumeSld.getValue());
             }
         }        
     }//GEN-LAST:event_VolumeSldStateChanged
