@@ -1,8 +1,9 @@
-
 import javazoom.jl.player.Player;
+import javatrack.MusicTrack;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.HeadlessException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -99,7 +100,7 @@ public class MusicGUI extends javax.swing.JFrame {
     public MusicGUI() {
         initComponents();
         fillTrackMap();
-        fillButtonMap();
+        fillButtonMap(); 
         
         Port outline;
         try {
@@ -144,7 +145,6 @@ public class MusicGUI extends javax.swing.JFrame {
                 } else if (!mp.isPlaying()) {
                     String relativeFilePath = Tracks.get("Track" + id);
                     mp = new MediaPlayer(relativeFilePath);
-                    //player = new Thread(mp);
                     player.run();
                 }
             } else {
@@ -159,8 +159,7 @@ public class MusicGUI extends javax.swing.JFrame {
         vc.setValue(f * 0.01f);        
     }
 
-    public void startLoop(String tr) { 
-        //tr = Track#
+    public void startLoop(String tr) {
        if(tr!=null){
            lmp = new LoopMediaPlayer(Tracks.get(tr));
            loopThread = new Thread(lmp);
@@ -175,6 +174,52 @@ public class MusicGUI extends javax.swing.JFrame {
             looping = false;
         }
     }
+    
+    public static void createSaveFile(HashMap tr){
+        int index = 1;
+        MusicTrack head = new MusicTrack(index, tr.get("Track"+(index)));
+        MusicTrack n = head;
+        while(index++<=tr.size()){
+            n.setNext(new MusicTrack(index, tr.get("Track"+(index))));            
+            n = n.getNext();
+        }
+        String name = JOptionPane.showInputDialog(null, "What is the name of your save file?", "Save", JOptionPane.QUESTION_MESSAGE);
+        if(name!=null){
+            MusicTrack.createFile(head,name);
+        }       
+    }
+    
+    public static void openSaveFile(HashMap tr, HashMap bg){
+        MusicTrack n;
+        MusicTrack head;
+        JFileChooser fc = new JFileChooser();
+        FileNameExtensionFilter f = new FileNameExtensionFilter("BIN FILES", "bin");
+        fc.setFileFilter(f);
+        fc.showOpenDialog(null);
+        File fp = fc.getSelectedFile();
+        if(fp!=null){
+            head = MusicTrack.openFile(fp.toString());
+            if(head.getBind()==-1){
+                JOptionPane.showMessageDialog(null, "The file you selected could not be read by this application because" +
+                        "it was not created by this application.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }else{
+                n = head;
+            }
+        }else return;        
+        int i = 1;
+        while (i <= 20) {
+            String tfp = n.getTrack();
+            tr.replace("Track" + i, tfp);
+            JButton jb = (JButton) bg.get(i++);
+            if(tfp!=null){
+                jb.setFont(Font.decode(jb.getFont().toString() + "-bold-16"));
+            }else{
+                jb.setFont(Font.decode(jb.getFont().toString() + "-plain-11"));
+            }
+            n = n.getNext();
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -186,10 +231,10 @@ public class MusicGUI extends javax.swing.JFrame {
     private void initComponents() {
 
         AddFrame = new javax.swing.JFrame();
-        Add_Cb = new javax.swing.JComboBox<>();
+        addCb = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
-        Add_ChooseBtn = new javax.swing.JButton();
-        Add_Txt = new javax.swing.JTextField();
+        addChooseBtn = new javax.swing.JButton();
+        addTxt = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         Add_BindDtn = new javax.swing.JButton();
         jSeparator4 = new javax.swing.JSeparator();
@@ -231,25 +276,26 @@ public class MusicGUI extends javax.swing.JFrame {
         Track20 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        menuItemSave = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        menuItemOpen = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        clearBoard = new javax.swing.JMenuItem();
 
         AddFrame.setTitle("Add A Track");
         AddFrame.setResizable(false);
         AddFrame.setSize(new java.awt.Dimension(410, 250));
 
-        Add_Cb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" }));
+        addCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" }));
 
         jLabel1.setText("Which song do you want to add?");
         jLabel1.setMaximumSize(new java.awt.Dimension(171, 14));
         jLabel1.setPreferredSize(new java.awt.Dimension(171, 14));
 
-        Add_ChooseBtn.setText("Choose");
-        Add_ChooseBtn.addActionListener(new java.awt.event.ActionListener() {
+        addChooseBtn.setText("Choose");
+        addChooseBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Add_ChooseBtnActionPerformed(evt);
+                addChooseBtnActionPerformed(evt);
             }
         });
 
@@ -271,14 +317,14 @@ public class MusicGUI extends javax.swing.JFrame {
                 .addGap(27, 27, 27)
                 .addGroup(AddFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(AddFrameLayout.createSequentialGroup()
-                        .addComponent(Add_ChooseBtn)
+                        .addComponent(addChooseBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(Add_Txt))
+                        .addComponent(addTxt))
                     .addGroup(AddFrameLayout.createSequentialGroup()
                         .addGroup(AddFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(Add_BindDtn)
-                            .addComponent(Add_Cb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(addCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 20, Short.MAX_VALUE)))
@@ -291,12 +337,12 @@ public class MusicGUI extends javax.swing.JFrame {
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(AddFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Add_ChooseBtn)
-                    .addComponent(Add_Txt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(addChooseBtn)
+                    .addComponent(addTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Add_Cb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(addCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -343,9 +389,9 @@ public class MusicGUI extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Mute"));
 
-        MuteTgl.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MuteTglActionPerformed(evt);
+        MuteTgl.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                MuteTglStateChanged(evt);
             }
         });
 
@@ -678,54 +724,62 @@ public class MusicGUI extends javax.swing.JFrame {
             ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ButtonPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(ButtonPanelLayout.createSequentialGroup()
-                        .addComponent(Track05, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(Track10, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(Track15, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(Track20, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(ButtonPanelLayout.createSequentialGroup()
-                        .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(Track02, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track01, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track04, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track03, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(19, 19, 19)
-                        .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(Track07, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track06, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track09, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track08, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(Track12, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track11, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track14, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track13, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(Track17, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track16, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track19, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Track18, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Track02, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track01, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track04, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track03, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track05, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(19, 19, 19)
+                .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Track07, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track06, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track09, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track08, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track10, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Track12, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track11, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track14, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track13, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track15, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(ButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Track17, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track16, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track19, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track18, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Track20, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         jMenu1.setText("File");
 
-        jMenuItem1.setText("Save");
-        jMenu1.add(jMenuItem1);
+        menuItemSave.setText("Save");
+        menuItemSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemSaveActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuItemSave);
         jMenu1.add(jSeparator1);
 
-        jMenuItem2.setText("Open");
-        jMenu1.add(jMenuItem2);
+        menuItemOpen.setText("Open");
+        menuItemOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemOpenActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuItemOpen);
 
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edit");
+
+        clearBoard.setText("Clear Board");
+        jMenu2.add(clearBoard);
+
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -779,6 +833,7 @@ public class MusicGUI extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void PlayBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PlayBtnActionPerformed
@@ -792,10 +847,6 @@ public class MusicGUI extends javax.swing.JFrame {
     private void StopBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StopBtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_StopBtnActionPerformed
-
-    private void MuteTglActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MuteTglActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_MuteTglActionPerformed
 
     private void AddBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddBtnActionPerformed
         if (!AddFrame.isVisible()) {
@@ -834,29 +885,30 @@ public class MusicGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_RemoveBtnActionPerformed
 
-    private void Add_ChooseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Add_ChooseBtnActionPerformed
+    private void addChooseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addChooseBtnActionPerformed
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter f = new FileNameExtensionFilter("MP3 Files", "mp3");
         chooser.setFileFilter(f);
         chooser.showOpenDialog(null);
-        String filePath = chooser.getSelectedFile().toString();
+        File fp = chooser.getSelectedFile();
         try {
+            String filePath = fp.toString();
             if (filePath.substring(filePath.length() - 3, filePath.length()).equalsIgnoreCase("mp3")) {
-                Add_Txt.setText(filePath);
+                addTxt.setText(filePath);
             } else {
                 JOptionPane.showMessageDialog(null, "The selected file is not in correct format.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (NullPointerException e) {
-            Add_Txt.setText("");
+            addTxt.setText("");
         }
-    }//GEN-LAST:event_Add_ChooseBtnActionPerformed
+    }//GEN-LAST:event_addChooseBtnActionPerformed
 
     private void Add_BindDtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Add_BindDtnActionPerformed
-        int id = Add_Cb.getSelectedIndex() + 1;
+        int id = addCb.getSelectedIndex() + 1;
         String name = "Track" + id;
-        if (Tracks.containsKey(name) && !Add_Txt.getText().equals("")) {
+        if (Tracks.containsKey(name) && !addTxt.getText().equals("")) {
             System.out.println("Track" + id);
-            Tracks.replace(name, Add_Txt.getText());
+            Tracks.replace(name, addTxt.getText());
             JButton jb = (JButton) ButtonGroup.get(id);
             jb.setFont(Font.decode(jb.getFont().toString() + "-bold-16"));
         }
@@ -956,6 +1008,22 @@ public class MusicGUI extends javax.swing.JFrame {
         }        
     }//GEN-LAST:event_VolumeSldStateChanged
 
+    private void MuteTglStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_MuteTglStateChanged
+         if(MuteTgl.isSelected()){
+             setVolume(0f);
+         }else{
+             setVolume((float) VolumeSld.getValue());
+         }
+    }//GEN-LAST:event_MuteTglStateChanged
+
+    private void menuItemSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSaveActionPerformed
+        createSaveFile(this.Tracks);
+    }//GEN-LAST:event_menuItemSaveActionPerformed
+
+    private void menuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenActionPerformed
+        openSaveFile(this.Tracks, this.ButtonGroup);
+    }//GEN-LAST:event_menuItemOpenActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -985,6 +1053,7 @@ public class MusicGUI extends javax.swing.JFrame {
 
         // Create and display the form 
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new MusicGUI().setVisible(true);
             }
@@ -995,9 +1064,6 @@ public class MusicGUI extends javax.swing.JFrame {
     private javax.swing.JButton AddBtn;
     private javax.swing.JFrame AddFrame;
     private javax.swing.JButton Add_BindDtn;
-    private javax.swing.JComboBox<String> Add_Cb;
-    private javax.swing.JButton Add_ChooseBtn;
-    private javax.swing.JTextField Add_Txt;
     private javax.swing.JButton BreakBtn;
     private javax.swing.JPanel ButtonPanel;
     private javax.swing.JButton LoopBtn;
@@ -1027,13 +1093,15 @@ public class MusicGUI extends javax.swing.JFrame {
     private javax.swing.JButton Track19;
     private javax.swing.JButton Track20;
     private javax.swing.JSlider VolumeSld;
+    private javax.swing.JComboBox<String> addCb;
+    private javax.swing.JButton addChooseBtn;
+    private javax.swing.JTextField addTxt;
+    private javax.swing.JMenuItem clearBoard;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1042,5 +1110,7 @@ public class MusicGUI extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JMenuItem menuItemOpen;
+    private javax.swing.JMenuItem menuItemSave;
     // End of variables declaration//GEN-END:variables
 }

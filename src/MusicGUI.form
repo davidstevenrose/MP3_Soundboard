@@ -18,15 +18,15 @@
                   <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="Add_ChooseBtn" min="-2" max="-2" attributes="0"/>
+                          <Component id="addChooseBtn" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="Add_Txt" max="32767" attributes="0"/>
+                          <Component id="addTxt" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jSeparator4" min="-2" pref="341" max="-2" attributes="0"/>
                               <Component id="Add_BindDtn" min="-2" max="-2" attributes="0"/>
-                              <Component id="Add_Cb" min="-2" max="-2" attributes="0"/>
+                              <Component id="addCb" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel1" alignment="0" min="-2" pref="213" max="-2" attributes="0"/>
                               <Component id="jLabel2" alignment="0" min="-2" pref="295" max="-2" attributes="0"/>
                           </Group>
@@ -44,13 +44,13 @@
                   <Component id="jLabel1" min="-2" pref="37" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="Add_ChooseBtn" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="Add_Txt" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="addChooseBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="addTxt" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel2" min="-2" pref="37" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="Add_Cb" min="-2" max="-2" attributes="0"/>
+                  <Component id="addCb" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jSeparator4" min="-2" pref="2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -61,7 +61,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JComboBox" name="Add_Cb">
+        <Component class="javax.swing.JComboBox" name="addCb">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="20">
@@ -103,15 +103,15 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="Add_ChooseBtn">
+        <Component class="javax.swing.JButton" name="addChooseBtn">
           <Properties>
             <Property name="text" type="java.lang.String" value="Choose"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="Add_ChooseBtnActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addChooseBtnActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JTextField" name="Add_Txt">
+        <Component class="javax.swing.JTextField" name="addTxt">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
@@ -140,17 +140,23 @@
             <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemSave">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Save"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemSaveActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemOpen">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Open"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemOpenActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -158,6 +164,13 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Edit"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="clearBoard">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Clear Board"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
         </Menu>
       </SubComponents>
     </Menu>
@@ -172,7 +185,7 @@
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="jMenuBar1"/>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
-    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="true"/>
   </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
@@ -343,7 +356,7 @@
       <SubComponents>
         <Component class="javax.swing.JCheckBox" name="MuteTgl">
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MuteTglActionPerformed"/>
+            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="MuteTglStateChanged"/>
           </Events>
         </Component>
       </SubComponents>
@@ -553,45 +566,36 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="Track05" min="-2" pref="87" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="Track10" min="-2" pref="87" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="Track15" min="-2" pref="87" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="Track20" min="-2" pref="87" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="Track02" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track01" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track04" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track03" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="Track07" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track06" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track09" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track08" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="Track12" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track11" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track14" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track13" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="Track17" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track16" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track19" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                              <Component id="Track18" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="Track02" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track01" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track04" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track03" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track05" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="Track07" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track06" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track09" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track08" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track10" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="Track12" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track11" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track14" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track13" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track15" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="Track17" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track16" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track19" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track18" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
+                      <Component id="Track20" alignment="3" min="-2" pref="87" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
