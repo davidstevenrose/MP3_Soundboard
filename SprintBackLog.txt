@@ -1,3 +1,7 @@
 PSI 1:
   Date: 8/8/18
   Notes: Fixed volume slider and looping method.
+PSI 2:
+  Date: 8/19/18
+  Notes: -Added functioning Save and Open menu options under the File tab.
+         -A few realignments of the sound buttons for better symmetry.
