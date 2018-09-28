@@ -7,4 +7,5 @@ PSI 2:
          -A few realignments of the sound buttons for better symmetry.
 PSI 3:
   Date: 8/19/18
-  Notes: -Added option to clear all sound attachments at once in the 'Edit' menu tab.
+  Notes: -Gave functionality to pause, stop and play buttons.
+         -Added option to clear all sound attachments at once in the 'Edit' menu tab.
