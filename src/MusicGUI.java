@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javatrack.PausablePlayer;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.Line.Info;
@@ -30,26 +31,30 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 class LoopMediaPlayer implements Runnable {
 
-    private boolean isPlaying; 
+    private PausablePlayer pp;
     private String fp;
 
     public LoopMediaPlayer(String file) {
-        this.isPlaying = true;
         this.fp = file;
     }    
-
-    public void setPlaying(boolean b) {
-        this.isPlaying = b;
+    
+    public void pausePausable(){
+            this.pp.pause();
+    }
+    
+    public void resumePausable(){
+        this.pp.resume();
+    }
+    
+    public void stopPausable(){
+        this.pp.stop();
     }
 
     @Override
     public void run() {
         try {
-            Player player;
-            while(isPlaying){
-                player = new Player(new FileInputStream(this.fp));
-                player.play();
-            }
+            this.pp = new PausablePlayer(new FileInputStream(this.fp), PausablePlayer.NOTSTARTED_LOOPING);
+            pp.play();            
         } catch (Exception e) {
             System.out.println("Exception caught: " + e.getMessage());
         }
@@ -57,32 +62,41 @@ class LoopMediaPlayer implements Runnable {
 }
 
 class MediaPlayer implements Runnable {
-
-    private boolean isPlaying; 
+ 
     private String fp;
+    private PausablePlayer pp;
 
     public MediaPlayer(String file) {
-        this.isPlaying = false;
         this.fp = file;
-    }    
+    }   
 
-    public boolean isPlaying() {
-        return this.isPlaying;
+    //public boolean isPlaying() {
+    //    return this.isPlaying;
+    //}
+    
+    public void pausePausible(){
+            this.pp.pause();
     }
+    
+    public void resumePausible(){
+        this.pp.resume();
+    }
+    
+    public void stopPausible(){
+        this.pp.stop();
+    }
+    
 
     @Override
     public void run() {
         try {                            
             FileInputStream fileInputStream = new FileInputStream(this.fp);
-            Player player = new Player(fileInputStream);
-            this.isPlaying = true;
-            player.play();
-            System.out.println("finished");
-            this.isPlaying = false;
+            this.pp = new PausablePlayer(fileInputStream);
+            this.pp.play();
         } catch (Exception e) {
             System.out.println("Exception caught: " + e.getMessage());
         }
-    }
+    }    
 }
 
 public class MusicGUI extends javax.swing.JFrame {
@@ -100,7 +114,7 @@ public class MusicGUI extends javax.swing.JFrame {
     public MusicGUI() {
         initComponents();
         fillTrackMap();
-        fillButtonMap(); 
+        fillButtonMap();
         
         Port outline;
         try {
@@ -126,7 +140,6 @@ public class MusicGUI extends javax.swing.JFrame {
                 ButtonGroup.put(Integer.parseInt(v.getName().substring(v.getName().length() - 2, v.getName().length())), v);
             }
         }
-
         for (Integer in : ButtonGroup.keySet()) {
             JButton jb = (JButton) ButtonGroup.get(in);
             jb.setText(in.toString());
@@ -136,14 +149,13 @@ public class MusicGUI extends javax.swing.JFrame {
     public void playMediaFromBind(int id) {
         try {            
             vc.setValue((float) VolumeSld.getValue());
+            String relativeFilePath = Tracks.get("Track" + id);
             if (Tracks.get("Track" + id) != null) {
                 if (!player.isAlive()) {//player is the new thread
-                    String relativeFilePath = Tracks.get("Track" + id);
                     mp = new MediaPlayer(relativeFilePath);
                     player = new Thread(mp);
                     player.start();
-                } else if (!mp.isPlaying()) {
-                    String relativeFilePath = Tracks.get("Track" + id);
+                } else{//previous clause was to prevent two files from playing at once                    
                     mp = new MediaPlayer(relativeFilePath);
                     player.run();
                 }
@@ -170,7 +182,6 @@ public class MusicGUI extends javax.swing.JFrame {
     
     public void stopLoop(){
         if (looping){
-            lmp.setPlaying(false);
             looping = false;
         }
     }
@@ -778,6 +789,11 @@ public class MusicGUI extends javax.swing.JFrame {
         jMenu2.setText("Edit");
 
         clearBoard.setText("Clear Board");
+        clearBoard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearBoardActionPerformed(evt);
+            }
+        });
         jMenu2.add(clearBoard);
 
         jMenuBar1.add(jMenu2);
@@ -837,15 +853,39 @@ public class MusicGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void PlayBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PlayBtnActionPerformed
-        // TODO add your handling code here:
+        if(!looping){
+            if(mp!=null){
+                mp.resumePausible();
+            }
+        }else{
+            if(lmp!=null){
+                lmp.resumePausable();
+            }
+        }
     }//GEN-LAST:event_PlayBtnActionPerformed
 
     private void PauseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PauseBtnActionPerformed
-        // TODO add your handling code here:
+        if(!looping){    
+            if(mp!=null){
+                mp.pausePausible();
+            }
+        }else{
+            if(lmp!=null){
+               lmp.resumePausable();
+            }
+        }
     }//GEN-LAST:event_PauseBtnActionPerformed
 
     private void StopBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StopBtnActionPerformed
-        // TODO add your handling code here:
+        if(!looping){
+            if(mp!=null){
+                mp.stopPausible();
+            }
+        }else{
+            if(lmp!=null){
+                lmp.resumePausable();
+            }
+        }
     }//GEN-LAST:event_StopBtnActionPerformed
 
     private void AddBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddBtnActionPerformed
@@ -1023,6 +1063,15 @@ public class MusicGUI extends javax.swing.JFrame {
     private void menuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenActionPerformed
         openSaveFile(this.Tracks, this.ButtonGroup);
     }//GEN-LAST:event_menuItemOpenActionPerformed
+
+    private void clearBoardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBoardActionPerformed
+        for(int i=0;i<Tracks.size();i++){
+            if (Tracks.replace(Tracks.get("Track"+(i+1)), null) != null) {
+                JButton jb = (JButton) ButtonGroup.get(i);
+                jb.setFont(Font.decode(jb.getFont().toString() + "-plain-11"));
+            }
+        }
+    }//GEN-LAST:event_clearBoardActionPerformed
 
     /**
      * @param args the command line arguments
