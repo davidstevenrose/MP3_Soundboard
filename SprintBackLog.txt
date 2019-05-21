@@ -5,3 +5,7 @@ PSI 2:
   Date: 8/19/18
   Notes: -Added functioning Save and Open menu options under the File tab.
          -A few realignments of the sound buttons for better symmetry.
+PSI 3:
+  Date: 8/19/18
+  Notes: -Gave functionality to pause, stop and play buttons.
+         -Added option to clear all sound attachments at once in the 'Edit' menu tab.
