@@ -1,4 +1,5 @@
-import javazoom.jl.player.Player;
+//import JavaPanes.JOptionSelectPane;
+//import javazoom.jl.player.Player;
 import javatrack.MusicTrack;
 import java.awt.Component;
 import java.awt.Font;
@@ -249,6 +250,9 @@ public class MusicGUI extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         Add_BindDtn = new javax.swing.JButton();
         jSeparator4 = new javax.swing.JSeparator();
+        aboutFrame = new javax.swing.JFrame();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextPane1 = new javax.swing.JTextPane();
         jSeparator2 = new javax.swing.JSeparator();
         jSeparator3 = new javax.swing.JSeparator();
         jPanel1 = new javax.swing.JPanel();
@@ -292,10 +296,12 @@ public class MusicGUI extends javax.swing.JFrame {
         menuItemOpen = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         clearBoard = new javax.swing.JMenuItem();
+        aboutItem = new javax.swing.JMenuItem();
 
         AddFrame.setTitle("Add A Track");
+        AddFrame.setPreferredSize(new java.awt.Dimension(400, 250));
         AddFrame.setResizable(false);
-        AddFrame.setSize(new java.awt.Dimension(410, 250));
+        AddFrame.setSize(new java.awt.Dimension(400, 250));
 
         addCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" }));
 
@@ -333,12 +339,12 @@ public class MusicGUI extends javax.swing.JFrame {
                         .addComponent(addTxt))
                     .addGroup(AddFrameLayout.createSequentialGroup()
                         .addGroup(AddFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(Add_BindDtn)
+                            .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(addCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 20, Short.MAX_VALUE)))
+                        .addGap(0, 22, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         AddFrameLayout.setVerticalGroup(
@@ -356,9 +362,34 @@ public class MusicGUI extends javax.swing.JFrame {
                 .addComponent(addCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
                 .addComponent(Add_BindDtn)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        aboutFrame.setTitle("About");
+        aboutFrame.setSize(new java.awt.Dimension(460, 300));
+
+        jTextPane1.setEditable(false);
+        jTextPane1.setBackground(new java.awt.Color(255, 255, 204));
+        jTextPane1.setText("<html>\n<h1>About This GUI</h1>\n<p>This is a project I have begun working on in 2018. This is a project I have developed on my own free time outside of class. Currently, there are twenty bindable buttons to bind and play mp3 files. Right now, the 'loop' button is not working functionally, and will take up alot of memory, so I am working  on debugging this.</p>\n<p>\nHere is a list of information to navigate this GUI:\n</p>\n<ul>\n<li>Play - plays the selected media if the media is paused</li>\n<li>Pause - pauses the selected media if there is one playing</li>\n<li>Stop - stops the media playing and removes it from the media player</li>\n<li> Edit - Clear Board - removes all bindings on the board (Remember to save!)</li>\n</ul>\n</html>");
+        jScrollPane1.setViewportView(jTextPane1);
+
+        javax.swing.GroupLayout aboutFrameLayout = new javax.swing.GroupLayout(aboutFrame.getContentPane());
+        aboutFrame.getContentPane().setLayout(aboutFrameLayout);
+        aboutFrameLayout.setHorizontalGroup(
+            aboutFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(aboutFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        aboutFrameLayout.setVerticalGroup(
+            aboutFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(aboutFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -413,13 +444,14 @@ public class MusicGUI extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(MuteTgl)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(MuteTgl)
-                .addGap(0, 7, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Track"));
@@ -796,6 +828,14 @@ public class MusicGUI extends javax.swing.JFrame {
         });
         jMenu2.add(clearBoard);
 
+        aboutItem.setText("About");
+        aboutItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(aboutItem);
+
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -829,8 +869,8 @@ public class MusicGUI extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -897,7 +937,10 @@ public class MusicGUI extends javax.swing.JFrame {
     private void LoopBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoopBtnActionPerformed
         try {
             if(!looping){
-                int r = Integer.parseInt(JOptionPane.showInputDialog(null, "Whitch Track do you wish to loop play?", "Loop a track", JOptionPane.QUESTION_MESSAGE));
+                String s = JOptionPane.showInputDialog(null, "Whitch Track do you wish to loop play?", "Loop a track", JOptionPane.QUESTION_MESSAGE);
+                if(s==null)
+                    return;
+                int r = Integer.parseInt(s);
                 if (Tracks.containsKey("Track" + Integer.toString(r)) && Tracks.get("Track" + Integer.toString(r)) != null) {
                     startLoop("Track" + Integer.toString(r));
                 } else {
@@ -913,7 +956,13 @@ public class MusicGUI extends javax.swing.JFrame {
 
     private void RemoveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveBtnActionPerformed
         try {
-            int r = Integer.parseInt(JOptionPane.showInputDialog(null, "Whitch Track do you wish to remove", "Remove a track", JOptionPane.QUESTION_MESSAGE));
+            String s = JOptionPane.showInputDialog(null, "Whitch Track do you wish to remove", "Remove a track", JOptionPane.QUESTION_MESSAGE);
+            if(s==null)
+                return;
+            int r = Integer.parseInt(s);
+            /*Object[] arr = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+            //JOptionSelectPane p = new JOptionSelectPane("Select a track to remove.", "Remove", arr);
+            int r = JOptionSelectPane.showOptionSelectPanel("Select a track to remove.", "Remove", arr);*/
             if (Tracks.replace("Track" + Integer.toString(r), null) != null) {
                 JButton jb = (JButton) ButtonGroup.get(r);
                 jb.setFont(Font.decode(jb.getFont().toString() + "-plain-11"));
@@ -1037,6 +1086,7 @@ public class MusicGUI extends javax.swing.JFrame {
 
     private void BreakBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BreakBtnActionPerformed
         stopLoop();
+        JOptionPane.showMessageDialog(null, "Loop ended. Press OK to continue.", "Loop Broken", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_BreakBtnActionPerformed
 
     private void VolumeSldStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_VolumeSldStateChanged
@@ -1073,15 +1123,16 @@ public class MusicGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_clearBoardActionPerformed
 
+    private void aboutItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutItemActionPerformed
+        //show about panel
+        aboutFrame.setVisible(true);
+    }//GEN-LAST:event_aboutItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html */
-
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -1097,8 +1148,7 @@ public class MusicGUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(MusicGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(MusicGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+        }        
 
         // Create and display the form 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -1142,6 +1192,8 @@ public class MusicGUI extends javax.swing.JFrame {
     private javax.swing.JButton Track19;
     private javax.swing.JButton Track20;
     private javax.swing.JSlider VolumeSld;
+    private javax.swing.JFrame aboutFrame;
+    private javax.swing.JMenuItem aboutItem;
     private javax.swing.JComboBox<String> addCb;
     private javax.swing.JButton addChooseBtn;
     private javax.swing.JTextField addTxt;
@@ -1155,10 +1207,12 @@ public class MusicGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JTextPane jTextPane1;
     private javax.swing.JMenuItem menuItemOpen;
     private javax.swing.JMenuItem menuItemSave;
     // End of variables declaration//GEN-END:variables
